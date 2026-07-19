@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niteesh Naik — AI/ML Engineer Portfolio</title>
+    <meta name="description" content="Niteesh Seetaram Naik — AI/ML Engineer specializing in Deep Learning, Computer Vision, and NLP. Explore my interactive 3D portfolio.">
+    <meta property="og:title" content="Niteesh Naik — AI/ML Engineer">
+    <meta property="og:description" content="Interactive 3D portfolio — AI Engineer, ML Specialist, Deep Learning Enthusiast">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Niteesh Naik — AI/ML Engineer">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loader" class="loader">
+        <div class="loader-inner">
+            <div class="loader-logo">
+            <div class="loader-orb"></div>
+            <img class="loader-avatar" src="profile.jpg" alt="Niteesh Naik">
+        </div>
+            <div class="loader-bar-container">
+                <div class="loader-bar" id="loaderBar"></div>
+            </div>
+            <div class="loader-text" id="loaderText">Initializing 3D World...</div>
+            <div class="loader-percentage" id="loaderPct">0%</div>
+        </div>
+    </div>
+
+    <!-- Canvas for Three.js -->
+    <canvas id="threeCanvas"></canvas>
+
+    <!-- HUD Overlay -->
+    <div id="hud" class="hud hidden">
+        
+        <!-- Navigation Trigger (Hamburger) -->
+        <button id="menuTrigger" class="menu-trigger" aria-label="Open Menu">
+            <div class="burger-line"></div>
+            <div class="burger-line"></div>
+            <div class="burger-line"></div>
+        </button>
+
+        <!-- Section Indicator -->
+        <div id="sectionIndicator" class="section-indicator">
+            <div class="indicator-dot active" data-section="0"></div>
+            <div class="indicator-dot" data-section="1"></div>
+            <div class="indicator-dot" data-section="2"></div>
+            <div class="indicator-dot" data-section="3"></div>
+            <div class="indicator-dot" data-section="4"></div>
+        </div>
+
+        <!-- Scroll Hint -->
+        <div id="scrollHint" class="scroll-hint">
+            <div class="scroll-mouse">
+                <div class="scroll-wheel"></div>
+            </div>
+            <span>Scroll to Explore</span>
+        </div>
+
+        <!-- Sound Toggle -->
+        <button id="soundToggle" class="sound-toggle" aria-label="Toggle Sound">
+            <svg id="soundOnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+            <svg id="soundOffIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hidden">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <line x1="23" y1="9" x2="17" y2="15"></line>
+                <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Side Navigation Menu -->
+    <nav id="sideMenu" class="side-menu">
+        <div class="menu-backdrop"></div>
+        <div class="menu-panel">
+            <button id="menuClose" class="menu-close" aria-label="Close Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="menu-header">
+                <div class="menu-avatar">
+                    <img src="profile.jpg" alt="Niteesh Naik">
+                </div>
+                <div class="menu-identity">
+                    <div class="menu-name">Niteesh Naik</div>
+                    <div class="menu-title">AI/ML Engineer</div>
+                </div>
+            </div>
+            <ul class="menu-links">
+                <li><a href="#" class="menu-link" data-section="0"><span class="link-num">01</span><span class="link-label">Home</span><span class="link-arrow">→</span></a></li>
+                <li><a href="#" class="menu-link" data-section="1"><span class="link-num">02</span><span class="link-label">About</span><span class="link-arrow">→</span></a></li>
+                <li><a href="#" class="menu-link" data-section="2"><span class="link-num">03</span><span class="link-label">Skills</span><span class="link-arrow">→</span></a></li>
+                <li><a href="#" class="menu-link" data-section="3"><span class="link-num">04</span><span class="link-label">Projects</span><span class="link-arrow">→</span></a></li>
+                <li><a href="#" class="menu-link" data-section="4"><span class="link-num">05</span><span class="link-label">Contact</span><span class="link-arrow">→</span></a></li>
+            </ul>
+            <div class="menu-socials">
+                <a href="mailto:niteeshnaikmuroor@gmail.com" class="social-btn" title="Email">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                </a>
+                <a href="https://github.com" target="_blank" class="social-btn" title="GitHub">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="social-btn" title="LinkedIn">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Panels (Overlaid on 3D scene) -->
+    <main id="contentContainer" class="content-container">
+
+        <!-- Section 0: Hero -->
+        <section id="section-0" class="panel hero-panel active">
+            <div class="panel-inner">
+                <div class="hero-tag">AI · ML · Deep Learning</div>
+                <h1 class="hero-name">
+                    <span class="hero-name-line">Niteesh</span>
+                    <span class="hero-name-line accent">Naik</span>
+                </h1>
+                <p class="hero-subtitle">Building intelligent systems that see, hear, and understand the world.</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">8.65</div>
+                        <div class="stat-label">CGPA</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-value">982</div>
+                        <div class="stat-label">TCS CodeVita Rank</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-value">3+</div>
+                        <div class="stat-label">Projects</div>
+                    </div>
+                </div>
+                <div class="hero-cta">
+                    <button class="btn-primary" id="exploreBtn">Explore World</button>
+                    <a href="Niteesh_Resume_v2.pdf" class="btn-secondary" download>Download CV</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: About -->
+        <section id="section-1" class="panel about-panel">
+            <div class="panel-inner">
+                <div class="panel-tag">Who I Am</div>
+                <h2 class="panel-title">About <span class="accent">Me</span></h2>
+                <div class="about-grid">
+                    <div class="about-text">
+                        <p>I'm <strong>Niteesh Seetaram Naik</strong>, a Computer Science (Data Science) undergraduate at <strong>Sai Vidya Institute of Technology</strong>, Bengaluru — graduating 2027 with a CGPA of 8.65/10.</p>
+                        <p>I specialize in building end-to-end <strong>ML pipelines</strong>, <strong>computer vision systems</strong>, and <strong>NLP models</strong>. My passion lies at the intersection of mathematics, code, and real-world impact.</p>
+                        <p>From medical AI diagnostics to multimodal sentiment analysis — I build systems that matter.</p>
+                    </div>
+                    <div class="about-cards">
+                        <div class="info-card">
+                            <div class="info-icon">🎓</div>
+                            <div class="info-content">
+                                <div class="info-title">Education</div>
+                                <div class="info-value">B.E CSE (Data Science)</div>
+                                <div class="info-sub">Sai Vidya Institute, 2023–2027</div>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-icon">📍</div>
+                            <div class="info-content">
+                                <div class="info-title">Location</div>
+                                <div class="info-value">Bengaluru, Karnataka</div>
+                                <div class="info-sub">India</div>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-icon">📱</div>
+                            <div class="info-content">
+                                <div class="info-title">Contact</div>
+                                <div class="info-value">+91 9611982234</div>
+                                <div class="info-sub">niteeshnaikmuroor@gmail.com</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Skills -->
+        <section id="section-2" class="panel skills-panel">
+            <div class="panel-inner">
+                <div class="panel-tag">Expertise</div>
+                <h2 class="panel-title">Technical <span class="accent">Skills</span></h2>
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <div class="skill-cat-icon">🐍</div>
+                        <div class="skill-cat-title">Languages</div>
+                        <div class="skill-tags">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">SQL</span>
+                            <span class="skill-tag">OOP</span>
+                            <span class="skill-tag">DSA</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-cat-icon">⚡</div>
+                        <div class="skill-cat-title">Frameworks & APIs</div>
+                        <div class="skill-tags">
+                            <span class="skill-tag">Flutter</span>
+                            <span class="skill-tag">FastAPI</span>
+                            <span class="skill-tag">LangChain</span>
+                            <span class="skill-tag">REST API</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-cat-icon">🧠</div>
+                        <div class="skill-cat-title">ML & Libraries</div>
+                        <div class="skill-tags">
+                            <span class="skill-tag">TensorFlow</span>
+                            <span class="skill-tag">PyTorch</span>
+                            <span class="skill-tag">Scikit-learn</span>
+                            <span class="skill-tag">OpenCV</span>
+                            <span class="skill-tag">NumPy</span>
+                            <span class="skill-tag">Pandas</span>
+                            <span class="skill-tag">Librosa</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-cat-icon">🔧</div>
+                        <div class="skill-cat-title">Dev Tools</div>
+                        <div class="skill-tags">
+                            <span class="skill-tag">Git</span>
+                            <span class="skill-tag">Docker</span>
+                            <span class="skill-tag">VS Code</span>
+                            <span class="skill-tag">CI/CD</span>
+                            <span class="skill-tag">Jupyter</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-cat-icon">🌐</div>
+                        <div class="skill-cat-title">Domains</div>
+                        <div class="skill-tags">
+                            <span class="skill-tag highlight">Machine Learning</span>
+                            <span class="skill-tag highlight">Deep Learning</span>
+                            <span class="skill-tag highlight">Computer Vision</span>
+                            <span class="skill-tag highlight">NLP</span>
+                            <span class="skill-tag highlight">Audio Processing</span>
+                            <span class="skill-tag highlight">Model Deployment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Projects -->
+        <section id="section-3" class="panel projects-panel">
+            <div class="panel-inner">
+                <div class="panel-tag">What I've Built</div>
+                <h2 class="panel-title">Featured <span class="accent">Projects</span></h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-glow"></div>
+                        <div class="project-header">
+                            <div class="project-icon">🏥</div>
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub">
+                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        <h3 class="project-title">MedGemma Insight</h3>
+                        <p class="project-desc">Medical AI diagnostic tool using MedGemma model for high-precision automated disease detection from medical imagery.</p>
+                        <div class="project-metrics">
+                            <div class="metric"><span class="metric-value">25%</span><span class="metric-label">Input Quality ↑</span></div>
+                            <div class="metric"><span class="metric-value">30%</span><span class="metric-label">Inference Speed ↑</span></div>
+                        </div>
+                        <div class="project-tech">
+                            <span>Python</span><span>MedGemma</span><span>OpenCV</span><span>Deep Learning</span>
+                        </div>
+                    </div>
+
+                    <div class="project-card featured">
+                        <div class="project-glow"></div>
+                        <div class="project-badge">Featured</div>
+                        <div class="project-header">
+                            <div class="project-icon">🎬</div>
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub">
+                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        <h3 class="project-title">Video Sentiment Analysis</h3>
+                        <p class="project-desc">End-to-end multimodal pipeline classifying 7 emotion classes across video and audio streams using MELD dataset fusion techniques.</p>
+                        <div class="project-metrics">
+                            <div class="metric"><span class="metric-value">18%</span><span class="metric-label">Accuracy ↑</span></div>
+                            <div class="metric"><span class="metric-value">40%</span><span class="metric-label">Review Time ↓</span></div>
+                        </div>
+                        <div class="project-tech">
+                            <span>PyTorch</span><span>NLP</span><span>Multimodal</span><span>MELD Dataset</span>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-glow"></div>
+                        <div class="project-header">
+                            <div class="project-icon">🎵</div>
+                            <div class="project-links">
+                                <a href="#" class="project-link" title="GitHub">
+                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        <h3 class="project-title">Audio Stem Separation</h3>
+                        <p class="project-desc">AI-powered audio processing tool to isolate individual stems (Vocals, Drums, Bass, Other) from mixed audio with professional-grade accuracy.</p>
+                        <div class="project-metrics">
+                            <div class="metric"><span class="metric-value">35%</span><span class="metric-label">Artifact ↓</span></div>
+                            <div class="metric"><span class="metric-value">&lt;20s</span><span class="metric-label">3min Track CPU</span></div>
+                        </div>
+                        <div class="project-tech">
+                            <span>Librosa</span><span>Wave-U-Net</span><span>STFT</span><span>Spleeter</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Contact -->
+        <section id="section-4" class="panel contact-panel">
+            <div class="panel-inner">
+                <div class="panel-tag">Let's Connect</div>
+                <h2 class="panel-title">Get In <span class="accent">Touch</span></h2>
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <p class="contact-text">Whether you have an exciting project, research collaboration, or just want to discuss AI — my inbox is always open.</p>
+                        <div class="contact-links">
+                            <a href="mailto:niteeshnaikmuroor@gmail.com" class="contact-item">
+                                <div class="contact-icon">✉️</div>
+                                <div class="contact-detail">
+                                    <div class="contact-label">Email</div>
+                                    <div class="contact-value">niteeshnaikmuroor@gmail.com</div>
+                                </div>
+                            </a>
+                            <a href="tel:+919611982234" class="contact-item">
+                                <div class="contact-icon">📞</div>
+                                <div class="contact-detail">
+                                    <div class="contact-label">Phone</div>
+                                    <div class="contact-value">+91 9611982234</div>
+                                </div>
+                            </a>
+                            <a href="https://linkedin.com" target="_blank" class="contact-item">
+                                <div class="contact-icon">💼</div>
+                                <div class="contact-detail">
+                                    <div class="contact-label">LinkedIn</div>
+                                    <div class="contact-value">Connect with me</div>
+                                </div>
+                            </a>
+                            <a href="https://github.com" target="_blank" class="contact-item">
+                                <div class="contact-icon">💻</div>
+                                <div class="contact-detail">
+                                    <div class="contact-label">GitHub</div>
+                                    <div class="contact-value">See my code</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="achievement-title">Achievements</div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">🏆</div>
+                            <div class="achievement-content">
+                                <div class="achievement-name">TCS CodeVita</div>
+                                <div class="achievement-detail">Global Rank 982 among 100,000+ participants</div>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">⚔️</div>
+                            <div class="achievement-content">
+                                <div class="achievement-name">LeetCode Warrior</div>
+                                <div class="achievement-detail">Active problem solver — Python DSA specialist</div>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">🎓</div>
+                            <div class="achievement-content">
+                                <div class="achievement-name">Academic Excellence</div>
+                                <div class="achievement-detail">CGPA 8.65/10 — Top performer in Data Science</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Section Labels (floating on canvas) -->
+    <div id="floatingLabels" class="floating-labels hidden">
+        <div class="float-label" id="label-about">About</div>
+        <div class="float-label" id="label-skills">Skills</div>
+        <div class="float-label" id="label-projects">Projects</div>
+        <div class="float-label" id="label-contact">Contact</div>
+    </div>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script src="main.js"></script>
+</body>
+</html>
